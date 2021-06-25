@@ -1,0 +1,177 @@
+<!-- Content Header (Page header) -->
+<script src="matricula.component.ts"></script>
+<div class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1 class="m-0 text-dark">{{title}}</h1>
+      </div><!-- /.col -->
+      <div class="col-sm-6">
+        <ol class="breadcrumb float-sm-right">
+          <li class="breadcrumb-item"><a [routerLink]="['inicio']" href="#">Inicio</a></li>
+          <li class="breadcrumb-item active">{{title}}</li>
+        </ol>
+      </div><!-- /.col -->
+    </div><!-- /.row -->
+  </div><!-- /.container-fluid -->
+</div>
+<!-- /.content-header -->
+
+<div class="content">
+  <div class="container-fluid">
+    <form [formGroup]="matriculas" (ngSubmit)="onSubmit()">
+      <p-panel [style]="{'margin-bottom': '10px'}">
+        <p-header>
+          <div class="ui-toolbar-group-left">
+            {{ matriculas.value.periodos ? 'Periodo: ' + matriculas.value.periodos.nombre : null }}
+          </div>
+          <div class="ui-toolbar-group-right"></div>
+        </p-header>
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="card border-success">
+              <div class="card-header">Datos del Alumno</div>
+              <div class="card-body text-success">
+                <div class="form-row">
+                  <div class="form-group col-md-6">
+                    <label>Nombres</label>
+                    <input type="text" pInputText placeholder="Nombres" style="width: 100%" value="{{ alumno ? alumno.nombres :  null }}" readonly>
+                  </div>
+                  <div class="form-group col-md-6">
+                    <label>Apellidos</label>
+                    <input type="text" pInputText placeholder="Apellidos" style="width: 100%" value="{{ alumno ? alumno.apellidos :  null }}" readonly>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group col-md-6">
+                    <label>Dni</label>
+                    <input type="text" pInputText placeholder="Dni" style="width: 100%" value="{{ alumno ? alumno.dni :  null }}" readonly>
+                  </div>
+                  <div class="form-group col-md-6">
+                    <label>Teléfono</label>
+                    <input type="text" pInputText placeholder="Teléfono" style="width: 100%" value="{{ alumno ? alumno.telefono :  null }}" readonly>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group col-md-12">
+                    <label>Dirección</label>
+                    <input type="text" pInputText placeholder="Dirección" style="width: 100%" value="{{ alumno ? alumno.direccion :  null }}" readonly>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group col-md-12">
+                    <label>Carrera</label>
+                    <h5 class="card-title text-secondary">{{ alumno.carreras.nombre }}</h5>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="card border-info">
+              <div class="card-header">Datos de la Matricula</div>
+              <div class="card-body text-info">
+                <div class="form-row">
+                  <div class="form-group col-md-6">
+                    <label>Matricula</label>
+                    <h5 class="card-title text-secondary">{{ matriculas.value.tipo_matriculas ? matriculas.value.tipo_matriculas.nombre : null }}</h5>
+                  </div>
+                  <div class="form-group col-md-6">
+                    <label>Costo</label>
+                    <h5 class="card-title text-secondary">{{ matriculas.value.tipo_matriculas ? 'S/ ' + matriculas.value.tipo_matriculas.importe : null }}</h5>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group col-md-6">
+                    <label>Ciclo</label>
+                    <p-dropdown [options]="data_c"
+                                optionLabel="nombre"
+                                (onChange)="onSelectCiclo($event.value)"
+                                placeholder="Seleccionar"
+                                [style]="{'width':'100%', 'margin-bottom':'3px'}"
+                                name="ciclos"
+                                formControlName="ciclos">
+                    </p-dropdown>
+                  </div>
+                  <div class="form-group col-md-6">
+                    <label>Tipo de Pago</label>
+                    <p-dropdown [options]="data_tp"
+                                (onChange)="onSelectTipoPago($event.value)"
+                                optionLabel="nombre"
+                                placeholder="Seleccionar"
+                                [style]="{'width':'100%', 'margin-bottom':'3px'}"
+                                name="tipo_pagos"
+                                formControlName="tipo_pagos">
+                    </p-dropdown>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group col-md-6">
+                    <label>Numero de Letras</label>
+                    <input type="text" pInputText placeholder="Letras" style="width: 100%" value="{{ matriculas.value.tipo_pagos ? matriculas.value.tipo_pagos.partes :  null }}" readonly>
+                  </div>
+                  <div class="form-group col-md-6">
+                    <label>Importe por Letra</label>
+                    <div class="ui-inputgroup">
+                      <span class="ui-inputgroup-addon">S</span>
+                      <input type="text" pInputText placeholder="Importe" style="width: 100%" value="{{ matriculas.value.tipo_pagos ? matriculas.value.tipo_pagos.importe / matriculas.value.tipo_pagos.partes :  null }}" readonly>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group col-md-6">
+                    <label>Tasa Desc. Aplicado</label>
+                    <div class="ui-inputgroup">
+                      <span class="ui-inputgroup-addon">%</span>
+                      <input type="text" name="tasa_descuento" formControlName="tasa_descuento" pInputText placeholder="Tasa de Descuento" style="width: 100%" readonly>
+                    </div>
+                  </div>
+                  <div class="form-group col-md-6">
+                    <label>Total a Pagar</label>
+                    <div class="ui-inputgroup">
+                      <span class="ui-inputgroup-addon">S</span>
+                      <input type="text" name="total" formControlName="total" pInputText placeholder="Total" style="width: 100%" readonly>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-12">
+            <div class="card">
+              <div class="card-header">
+                <div class="ui-toolbar-group-left">
+                  <button routerLink="inicio"
+                          type="button"
+                          pButton
+                          icon="pi pi-times"
+                          class="ui-button-danger"
+                          label="Cancelar">
+                  </button>
+                </div>
+                <div class="ui-toolbar-group-right">
+                  <button type="submit"
+                          pButton
+                          [disabled]="!matriculas.valid"
+                          icon="pi pi-check"
+                          class="ui-button-success"
+                          label="Continuar">
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </p-panel>
+    </form>
+  </div>
+</div>
+
+<!--Growl-->
+<p-growl [(value)]="msgs"></p-growl>
+
+<p-dialog [style]="{'background-color': 'transparent', 'border': 'none', 'box-shadow': 'none'}"
+          [showHeader]="false" [(visible)]="display" [modal]="true" [resizable]="true"
+          [minY]="70" [maximizable]="true" [baseZIndex]="10000">
+  <p align="center" style="font-size: 200px; color: #b8c7ce;"><i class="fa fa-spinner fa-pulse"></i></p>
+</p-dialog>

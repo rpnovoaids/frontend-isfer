@@ -1,0 +1,306 @@
+<!-- Content Header (Page header) -->
+<div class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1 class="m-0 text-dark">{{title}}</h1>
+      </div><!-- /.col -->
+      <div class="col-sm-6">
+        <ol class="breadcrumb float-sm-right">
+          <li class="breadcrumb-item"><a [routerLink]="['inicio']" href="#">Inicio</a></li>
+          <li class="breadcrumb-item active">{{title}}</li>
+        </ol>
+      </div><!-- /.col -->
+    </div><!-- /.row -->
+  </div><!-- /.container-fluid -->
+</div>
+<!-- /.content-header -->
+
+<div class="content">
+  <div class="container-fluid">
+    <p-panel>
+      <p-header>
+        <div class="ui-toolbar-group-left">
+          Ajustes
+        </div>
+        <div class="ui-toolbar-group-right">
+          <button [routerLink]="['']"
+                  type="button"
+                  pButton
+                  icon="pi pi-times"
+                  class="ui-button-danger"
+                  label="Salir">
+          </button>
+        </div>
+      </p-header>
+      <div class="row">
+        <div class="col-md-7">
+          <p-panel>
+            <p-header>Etapas</p-header>
+            <p-toolbar>
+              <div class="ui-toolbar-group-left">
+                <i class="fa fa-search" style="margin:4px 4px 0 0"></i>
+                <input #gb type="text" pInputText placeholder="Buscar...">
+              </div>
+              <div class="ui-toolbar-group-right">
+                <button type="button"
+                        pButton
+                        (click)="loadEtapas()"
+                        icon="pi pi-refresh"
+                        class="ui-button-success">
+                </button>
+                <button type="button"
+                        pButton
+                        (click)="addEtapas()"
+                        icon="pi pi-plus">
+                </button>
+              </div>
+            </p-toolbar>
+            <p-dataTable [value]="data_e"
+                         selectionMode="single"
+                         (onRowDblclick)="loadCiclos($event.data)"
+                         [globalFilter]="gb"
+                         [paginator]="true"
+                         [rows]="[5]"
+                         [responsive]="true"
+                         [loading]="loading_e">
+              <p-column field="inicio"
+                        header="INICIA"
+                        [sortable]="true">
+                <ng-template let-col let-car="rowData" pTemplate="body">
+                  <div>{{ car[col.field] ? formatDate(car[col.field]) : null }}</div>
+                </ng-template>
+              </p-column>
+              <p-column field="final"
+                        header="FINALIZA"
+                        [sortable]="true">
+                <ng-template let-col let-car="rowData" pTemplate="body">
+                  <div>{{ car[col.field] ? formatDate(car[col.field]) : null }}</div>
+                </ng-template>
+              </p-column>
+              <p-column field="estado"
+                        header="ESTADO"
+                        [style]="{'width':'100px'}"
+                        [sortable]="true">
+                <ng-template let-col let-car="rowData" pTemplate="body">
+                  <div *ngIf="car[col.field] == 1; then thenBlock else elseBlock"></div>
+                  <ng-template #thenBlock>ACTIVO</ng-template>
+                  <ng-template #elseBlock>BLOQUEADO</ng-template>
+                </ng-template>
+              </p-column>
+              <p-column field=""
+                        header="ACCIÓN"
+                        [style]="{'width':'125px'}"
+                        [sortable]="true">
+                <ng-template let-carreras="rowData" pTemplate="body">
+                  <div class="ui-helper-clearfix">
+                    <button type="button"
+                            pButton
+                            (click)="editEtapas(carreras)"
+                            icon="pi pi-pencil"
+                            style="float:left; margin: 5px"
+                            label="Editar">
+                    </button>
+                  </div>
+                </ng-template>
+              </p-column>
+            </p-dataTable>
+          </p-panel>
+        </div>
+        <div class="col-md-5">
+          <p-panel>
+            <p-header>Ciclos</p-header>
+            <p-toolbar>
+              <div class="ui-toolbar-group-left">
+                <i class="fa fa-search" style="margin:4px 4px 0 0"></i>
+                <input #gb type="text" pInputText placeholder="Buscar...">
+              </div>
+              <div class="ui-toolbar-group-right">
+                <button type="button"
+                        pButton
+                        (click)="loadCiclos(etapa)"
+                        icon="pi pi-refresh"
+                        class="ui-button-success">
+                </button>
+                <button type="button"
+                        pButton
+                        (click)="addCiclos()"
+                        icon="pi pi-plus">
+                </button>
+              </div>
+            </p-toolbar>
+            <p-dataTable [value]="data_cl"
+                         selectionMode="single"
+                         [globalFilter]="gb"
+                         [paginator]="true"
+                         [rows]="[5]"
+                         [responsive]="true"
+                         [loading]="loading2">
+              <p-column field="nombre"
+                        header="CICLO"
+                        [sortable]="true">
+              </p-column>
+              <p-column field="estado"
+                        header="ESTADO"
+                        [style]="{'width':'100px'}"
+                        [sortable]="true">
+                <ng-template let-col let-car="rowData" pTemplate="body">
+                  <div *ngIf="car[col.field] == 1; then thenBlock else elseBlock"></div>
+                  <ng-template #thenBlock>ACTIVO</ng-template>
+                  <ng-template #elseBlock>BLOQUEADO</ng-template>
+                </ng-template>
+              </p-column>
+              <p-column field=""
+                        header="ACCIÓN"
+                        [style]="{'width':'125px'}"
+                        [sortable]="true">
+                <ng-template let-ciclos="rowData" pTemplate="body">
+                  <div class="ui-helper-clearfix">
+                    <button type="button"
+                            pButton
+                            (click)="editCiclos(ciclos)"
+                            icon="pi pi-pencil"
+                            style="float:left; margin: 5px"
+                            label="Editar">
+                    </button>
+                  </div>
+                </ng-template>
+              </p-column>
+            </p-dataTable>
+          </p-panel>
+        </div>
+      </div>
+    </p-panel>
+  </div>
+</div>
+
+<!--Growl-->
+<p-growl [(value)]="msgs"></p-growl>
+
+<!--Etapas-->
+<form [formGroup]="etapas">
+  <p-dialog [(visible)]="display_e" [responsive]="true" [modal]="true" [maximizable]="true" [baseZIndex]="100">
+    <p-header>
+      {{title_e}}
+    </p-header>
+    <div class="ui-grid ui-grid-responsive ui-fluid">
+      <div class="ui-grid-row">
+        <div class="ui-grid-col-4">
+          <label>Fecha Inicio <span class="red"> (*)</span></label>
+        </div>
+        <div class="ui-grid-col-8">
+          <p-calendar [locale]="es"
+                      dateFormat="dd/mm/yy"
+                      [showIcon]="true"
+                      placeholder="Fecha de Inicio"
+                      class="toUpperCase"
+                      name="inicio_e"
+                      formControlName="inicio">
+          </p-calendar>
+        </div>
+      </div>
+      <div class="ui-grid-row">
+        <div class="ui-grid-col-4">
+          <label>Fecha Final <span class="red"> (*)</span></label>
+        </div>
+        <div class="ui-grid-col-8">
+          <p-calendar [locale]="es"
+                      dateFormat="dd/mm/yy"
+                      [showIcon]="true"
+                      placeholder="Fecha de Final"
+                      class="toUpperCase"
+                      name="final_e"
+                      formControlName="final">
+          </p-calendar>
+        </div>
+      </div>
+      <div class="ui-grid-row">
+        <div class="ui-grid-col-4">
+          <label>Estado</label>
+        </div>
+        <div class="ui-grid-col-8">
+          <p-checkbox binary="true"
+                      name="estado_e"
+                      formControlName="estado">
+          </p-checkbox>
+        </div>
+      </div>
+    </div>
+    <p-footer>
+      <div class="ui-dialog-buttonpane ui-helper-clearfix">
+        <button type="button"
+                pButton
+                (click)="saveEtapas()"
+                icon="pi pi-check"
+                style="float: right"
+                label="Guardar"
+                [disabled]="!etapas.valid"
+                class="ui-button-success">
+        </button>
+        <button type="button"
+                pButton
+                (click)="display_e = false"
+                icon="pi pi-times"
+                label="Cancelar"
+                class="ui-button-danger">
+        </button>
+      </div>
+    </p-footer>
+  </p-dialog>
+</form>
+
+<!--Ciclos-->
+<form [formGroup]="ciclos">
+  <p-dialog [(visible)]="display_cl" [responsive]="true" [modal]="true">
+    <p-header>
+      {{title_cl}}
+    </p-header>
+    <div class="ui-grid ui-grid-responsive ui-fluid">
+      <div class="ui-grid-row">
+        <div class="ui-grid-col-4">
+          <label>Ciclo <span class="red"> (*)</span></label>
+        </div>
+        <div class="ui-grid-col-8">
+          <input pInputText formControlName="nombre" maxlength="2" minlength="1">
+        </div>
+      </div>
+      <div class="ui-grid-row">
+        <div class="ui-grid-col-4">
+          <label>Estado</label>
+        </div>
+        <div class="ui-grid-col-8">
+          <p-checkbox binary="true"
+                      name="estado_cl"
+                      formControlName="estado">
+          </p-checkbox>
+        </div>
+      </div>
+    </div>
+    <p-footer>
+      <div class="ui-dialog-buttonpane ui-helper-clearfix">
+        <button type="button"
+                pButton
+                (click)="saveCiclos()"
+                icon="pi pi-check"
+                style="float: right"
+                label="Guardar"
+                [disabled]="!ciclos.valid"
+                class="ui-button-success">
+        </button>
+        <button type="button"
+                pButton
+                (click)="display_cl = false"
+                icon="pi pi-times"
+                label="Cancelar"
+                class="ui-button-danger">
+        </button>
+      </div>
+    </p-footer>
+  </p-dialog>
+</form>
+
+<p-dialog [style]="{'background-color': 'transparent', 'border': 'none', 'box-shadow': 'none'}"
+          [showHeader]="false" [(visible)]="display" [modal]="true" [resizable]="true"
+          [minY]="70" [maximizable]="true" [baseZIndex]="10000">
+  <p align="center" style="font-size: 200px; color: #b8c7ce;"><i class="fa fa-spinner fa-pulse"></i></p>
+</p-dialog>

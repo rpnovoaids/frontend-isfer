@@ -1,0 +1,261 @@
+<p-growl [(value)]="msgs"></p-growl>
+<div class="login-logo" style="margin-bottom: 10px">
+  <a [routerLink]="['/']" href="#" class="text-center">
+    <img src="assets/dist/img/isfer/isfer.png" alt="Logo" width="80%">
+  </a>
+</div>
+
+<div *ngIf="next != 6" class="card card-primary">
+
+  <div class="card-header">
+    <h3 class="card-title">
+      {{title}}
+      <a *ngIf="next != 0 && next != 6" (click)="next = next - 1"><i class="fa fa-angle-left right" style="float: right;"></i></a>
+    </h3>
+  </div>
+
+  <div class="card-body register-card-body">
+
+    <form [formGroup]="signUp" (ngSubmit)="onSubmit(0)">
+      <div *ngIf="next == 0">
+        <div class="form-group">
+          <label>Dni</label>
+          <input type="email"
+                 pInputText
+                 style="width: 100%;"
+                 placeholder="Dni"
+                 formControlName="dni"
+                 pTooltip="Ingrese su DNI"
+                 tooltipEvent="focus"
+                 (blur)="blurDni()"
+                 pKeyFilter="num"
+                 minlength="8"
+                 maxlength="8"
+                 required autofocus>
+          <small *ngIf="!signUp.controls['dni'].valid && signUp.controls['dni'].touched" class="form-text text-danger">Ingrese su DNI</small>
+        </div>
+        <div class="form-group">
+          <label>Nombres</label>
+          <input type="email"
+                 pInputText
+                 style="width: 100%;"
+                 placeholder="Nombres"
+                 formControlName="nombres"
+                 pTooltip="Ingrese su(s) Nombre(s)"
+                 tooltipEvent="focus"
+                 [pKeyFilter]="textBlock"
+                 minlength="3"
+                 maxlength="30"
+                 required>
+          <small *ngIf="!signUp.controls['nombres'].valid && signUp.controls['nombres'].touched" class="form-text text-danger">Ingrese su(s) Nombre(s)</small>
+        </div>
+        <div class="form-group">
+          <label>Apellidos</label>
+          <input type="email"
+                 pInputText
+                 style="width: 100%;"
+                 placeholder="Apellidos"
+                 formControlName="apellidos"
+                 pTooltip="Ingrese sus Apellidos"
+                 tooltipEvent="focus"
+                 [pKeyFilter]="textBlock"
+                 minlength="3"
+                 maxlength="40"
+                 required>
+          <small *ngIf="!signUp.controls['apellidos'].valid && signUp.controls['apellidos'].touched" class="form-text text-danger">Ingrese sus Apellidos</small>
+        </div>
+      </div>
+      <div *ngIf="next == 1">
+        <div class="form-group">
+          <label>Sexo</label>
+          <p-dropdown [options]="data_s"
+                      placeholder="Seleccionar"
+                      [style]="{'width':'100%', 'margin-bottom':'3px'}"
+                      name="sexo"
+                      formControlName="sexo" required>
+          </p-dropdown>
+        </div>
+        <div class="form-group">
+          <label>Edad</label>
+          <input type="text"
+                 pInputText
+                 style="width: 100%;"
+                 placeholder="Edad"
+                 formControlName="edad"
+                 pTooltip="Ingrese sus Edad"
+                 tooltipEvent="focus"
+                 pKeyFilter="int"
+                 minlength="2"
+                 maxlength="2"
+                 required>
+          <small *ngIf="!signUp.controls['edad'].valid && signUp.controls['edad'].touched" class="form-text text-danger">Ingrese sus Edad</small>
+        </div>
+        <div class="form-group">
+          <label>Fecha Nacimiento</label><br>
+          <p-calendar [locale]="es"
+                      dateFormat="dd/mm/yy"
+                      [showIcon]="true"
+                      placeholder="Fecha de Nacimiento"
+                      class="toUpperCase"
+                      name="nacimiento"
+                      formControlName="nacimiento"
+                      [monthNavigator]="true"
+                      [yearNavigator]="true"
+                      yearRange="1980:2018">
+          </p-calendar>
+        </div>
+      </div>
+      <div *ngIf="next == 2">
+        <div class="form-group">
+          <label>Dirección</label>
+          <input type="email"
+                 pInputText
+                 style="width: 100%;"
+                 placeholder="Dirección"
+                 formControlName="direccion"
+                 pTooltip="Ingrese su Dirección"
+                 tooltipEvent="focus"
+                 [pKeyFilter]="dir"
+                 minlength="3"
+                 required autofocus>
+          <small *ngIf="!signUp.controls['direccion'].valid && signUp.controls['direccion'].touched" class="form-text text-danger">Ingrese su Dirección</small>
+        </div>
+        <div class="form-group">
+          <label>Teléfono de Contacto</label>
+          <input type="text"
+                 pInputText
+                 style="width: 100%;"
+                 placeholder="Teléfono"
+                 formControlName="telefono"
+                 pTooltip="Ingrese su Teléfono de Contacto"
+                 tooltipEvent="focus"
+                 [pKeyFilter]="tel"
+                 minlength="5"
+                 maxlength="20"
+                 required>
+          <small *ngIf="!signUp.controls['telefono'].valid && signUp.controls['telefono'].touched" class="form-text text-danger">Ingrese su Teléfono de Contacto</small>
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email"
+                 pInputText
+                 style="width: 100%;"
+                 placeholder="@email"
+                 formControlName="email"
+                 pTooltip="Ingrese su Email"
+                 tooltipEvent="focus"
+                 (blur)="blurEmail()"
+                 [pKeyFilter]="e_mail"
+                 required>
+          <small *ngIf="!signUp.controls['email'].valid && signUp.controls['email'].touched" class="form-text text-danger">Ingrese su Email</small>
+        </div>
+      </div>
+      <div *ngIf="next == 3">
+        <div class="form-group">
+          <label>Carrera</label>
+          <p-dropdown [options]="data_c"
+                      optionLabel="nombre"
+                      placeholder="Seleccionar"
+                      [style]="{'width':'100%', 'margin-bottom':'3px'}"
+                      (onChange)="selectCarrera($event.value)"
+                      name="carreras"
+                      formControlName="carreras">
+          </p-dropdown>
+        </div>
+      </div>
+      <div *ngIf="next == 4">
+        <div class="form-group">
+          <label>Nombre de Usuario</label>
+          <input type="email"
+                 pInputText
+                 style="width: 100%;"
+                 placeholder="@email"
+                 formControlName="email"
+                 [readonly]="true">
+        </div>
+        <div class="form-group">
+          <label>Contraseña</label>
+          <input type="password"
+                 pPassword
+                 style="width: 100%"
+                 placeholder="Contraseña"
+                 formControlName="password"
+                 [promptLabel]="pw.promptLabelOne"
+                 [weakLabel]="pw.weakLabel"
+                 [mediumLabel]="pw.mediumLabel"
+                 [strongLabel]="pw.strongLabel"
+                 minlength="6"
+                 maxlength="20"
+                 required>
+          <small *ngIf="!signUp.controls['password'].valid && signUp.controls['password'].touched" class="form-text text-danger">Ingrese su Contraseña, 6 dígitos como mínimo</small>
+        </div>
+        <div class="form-group">
+          <label>Confirmar Contraseña</label>
+          <input type="password"
+                 pPassword
+                 style="width: 100%"
+                 placeholder="Contraseña"
+                 formControlName="pass"
+                 [promptLabel]="pw.promptLabelTwo"
+                 [weakLabel]="pw.weakLabel"
+                 [mediumLabel]="pw.mediumLabel"
+                 [strongLabel]="pw.strongLabel"
+                 minlength="6"
+                 maxlength="20"
+                 required>
+          <small *ngIf="!signUp.controls['pass'].valid && signUp.controls['pass'].touched" class="form-text text-danger">Confirme su Contraseña, 6 dígitos como mínimo</small>
+        </div>
+      </div>
+      <div *ngIf="next == 5">
+        <div class="form-group">
+          <label>Imagen</label>
+          <p-fileUpload name="imagen[]"
+                        [chooseLabel]="choose"
+                        [showUploadButton]="false"
+                        [showCancelButton]="false"
+                        (onSelect)="onUpload($event)"
+                        accept="image/*">
+          </p-fileUpload>
+        </div>
+      </div>
+      <div *ngIf="next != 6" class="row">
+        <div class="col-4">
+          <button *ngIf="next == 5" (click)="onSubmit(next = 6)" type="button" class="btn btn-outline-secondary btn-block btn-flat">Omitir</button>
+        </div>
+        <div class="col-4"></div>
+        <!-- /.col -->
+        <div class="col-4">
+          <button *ngIf="next != 6" type="submit" class="btn btn-primary btn-block btn-flat">Continuar</button>
+        </div>
+        <!-- /.col -->
+      </div>
+    </form>
+
+    <div *ngIf="next == 0" class="social-auth-links text-center">
+      <p>- O -</p>
+      <a routerLink="/ingresar" href="#" class="btn btn-block btn-success">
+        <i class="fa fa-user mr-2"></i>
+        Ingresar
+      </a>
+    </div>
+
+  </div>
+  <!-- /.form-box -->
+</div><!-- /.card -->
+
+<div *ngIf="next == 6" class="card card-primary card-outline">
+  <div class="card-body box-profile">
+    <div class="text-center">
+      <img *ngIf="signUp.value.src_img" class="profile-user-img img-fluid img-circle" src="{{ url + '/storage/avatars/' + signUp.value.src_img }}" alt="User profile picture">
+      <div *ngIf="!signUp.value.src_img">
+        <img *ngIf="signUp.value.sexo == 0" class="profile-user-img img-fluid img-circle" src="assets/dist/img/user1-128x128.jpg" alt="User profile picture">
+        <img *ngIf="signUp.value.sexo == 1" class="profile-user-img img-fluid img-circle" src="assets/dist/img/user4-128x128.jpg" alt="User profile picture">
+        <img *ngIf="signUp.value.sexo == 2" class="profile-user-img img-fluid img-circle" src="assets/dist/img/iestpam.png" alt="User profile picture">
+      </div>
+    </div>
+
+    <h3 class="profile-username text-center text-uppercase">{{signUp.value ? signUp.value.nombres + ' ' + signUp.value.apellidos : 'Developer'}}</h3>
+    <p class="text-muted text-center">{{signUp.value ? signUp.value.carreras.nombre : 'Developer'}}</p>
+    <a routerLink="/ingresar" href="#" class="btn btn-success btn-block"><b>Iniciar Sesión</b></a>
+  </div>
+</div>

@@ -1,0 +1,439 @@
+<!-- Content Header (Page header) -->
+<div class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1 class="m-0 text-dark">{{title}}</h1>
+      </div><!-- /.col -->
+      <div class="col-sm-6">
+        <ol class="breadcrumb float-sm-right">
+          <li class="breadcrumb-item"><a [routerLink]="['inicio']" href="#">Inicio</a></li>
+          <li class="breadcrumb-item active">{{title}}</li>
+        </ol>
+      </div><!-- /.col -->
+    </div><!-- /.row -->
+  </div><!-- /.container-fluid -->
+</div>
+<!-- /.content-header -->
+
+<div class="content">
+  <div class="container-fluid">
+    <p-panel *ngIf="!matriculas.value.id">
+      <p-header>
+        <div class="ui-toolbar-group-left">
+          Matriculas Realizadas
+        </div>
+        <div class="ui-toolbar-group-right">
+          <button routerLink="inicio"
+                  type="button"
+                  pButton
+                  icon="pi pi-times"
+                  class="ui-button-danger"
+                  label="Salir">
+          </button>
+        </div>
+      </p-header>
+      <p-toolbar>
+        <div class="ui-toolbar-group-left">
+          <i class="fa fa-search" style="margin:4px 4px 0 0"></i>
+          <input #gb_m type="text" pInputText placeholder="Buscar...">
+        </div>
+        <div class="ui-toolbar-group-right">
+          <button type="button" pButton (click)="display_r = true" icon="pi pi-print" class="ui-button-danger"></button>
+          <button type="button" pButton (click)="toggleMatriculas()" icon="pi pi-list" style="padding-left: 3px; padding-right: 3px;"></button>
+          <button type="button" pButton (click)="loadData()" icon="pi pi-refresh" class="ui-button-success"></button>
+        </div>
+      </p-toolbar>
+      <p-dataTable [value]="data_m"
+                   selectionMode="single"
+                   (onRowDblclick)="selectMatricula($event.data)"
+                   [globalFilter]="gb_m"
+                   [paginator]="true"
+                   [rows]="[5]"
+                   [responsive]="true"
+                   [stacked]="stacked_m" #dt>
+        <!--<p-header><p-multiSelect [options]="cols_opt_m" [(ngModel)]="cols_m"></p-multiSelect></p-header>
+        <p-column *ngFor="let col of cols_m" [field]="col.field" [header]="col.header"></p-column>-->
+        <p-column field="alumnos.dni"
+                  header="DNI"
+                  [filter]="true"
+                  [sortable]="true">
+        </p-column>
+        <p-column field="alumnos"
+                  header="NOMBRE"
+                  [filter]="true"
+                  [sortable]="true">
+          <ng-template let-col let-car="rowData" pTemplate="body">
+            <div>{{ car[col.field].apellidos + ' ' + car[col.field].nombres }}</div>
+          </ng-template>
+        </p-column>
+        <p-column field="carreras.nombre"
+                  header="CARRERA"
+                  [filter]="true"
+                  [sortable]="true"
+                  [style]="{'width':'220px'}"
+                  filterMatchMode="equals">
+          <ng-template pTemplate="filter" let-col>
+            <p-dropdown [options]="data_c"
+                        optionLabel="nombre"
+                        (onChange)="$event.value.nombre != 'TODOS' ?
+                          dt.filter($event.value.nombre,col.field,col.filterMatchMode) :
+                          dt.filter(null,col.field,col.filterMatchMode)">
+            </p-dropdown>
+          </ng-template>
+        </p-column>
+        <p-column field="ciclos.nombre"
+                  header="CICLO"
+                  [filter]="true"
+                  [sortable]="true"
+                  [style]="{'width':'220px'}"
+                  filterMatchMode="equals">
+          <ng-template pTemplate="filter" let-col>
+            <p-dropdown [options]="data_cl"
+                        optionLabel="nombre"
+                        (onChange)="$event.value.nombre != 'TODOS' ?
+                          dt.filter($event.value.nombre,col.field,col.filterMatchMode) :
+                          dt.filter(null,col.field,col.filterMatchMode)">
+            </p-dropdown>
+          </ng-template>
+        </p-column>
+        <p-column field="created_at"
+                  header="REGISTRADO"
+                  [filter]="true"
+                  [sortable]="true">
+          <ng-template pTemplate="filter" let-col>
+            <p-calendar dateFormat="dd/mm/yy"
+                        [locale]="es"
+                        (onSelect)="dt.filter(formatDateTime($event), col.field, 'equals')"
+                        (onClearClick)="dt.filter(null, col.field, 'equals')"
+                        [inputStyle]="{'width': '100%'}" [readonlyInput]="true" [showButtonBar]="true">
+            </p-calendar>
+          </ng-template>
+        </p-column>
+        <p-column field="updated_at"
+                  header="ACTUALIZADO"
+                  [filter]="true"
+                  [sortable]="true">
+          <ng-template pTemplate="filter" let-col>
+            <p-calendar dateFormat="dd/mm/yy"
+                        [locale]="es"
+                        (onSelect)="dt.filter(formatDateTime($event), col.field, 'equals')"
+                        (onClearClick)="dt.filter(null, col.field, 'equals')"
+                        [inputStyle]="{'width': '100%'}" [readonlyInput]="true" [showButtonBar]="true">
+            </p-calendar>
+          </ng-template>
+        </p-column>
+        <p-column field="estado"
+                  header="ESTADO"
+                  [filter]="true"
+                  [sortable]="true"
+                  [style]="{'width':'220px'}"
+                  filterMatchMode="equals">
+          <ng-template pTemplate="filter" let-col>
+            <p-dropdown [options]="data_es"
+                        (onChange)="$event.value.value != null ?
+                          dt.filter($event.value.value,col.field,col.filterMatchMode) :
+                          dt.filter(null,col.field,col.filterMatchMode)">
+            </p-dropdown>
+          </ng-template>
+          <ng-template let-col let-car="rowData" pTemplate="body">
+            <div *ngIf="car[col.field] == 0">ANULADO</div>
+            <div *ngIf="car[col.field] == 1">PAGADO</div>
+            <div *ngIf="car[col.field] == 2">PROCESO</div>
+            <div *ngIf="car[col.field] == 3">OBSERVADO</div>
+            <div *ngIf="car[col.field] == 4">EMITIDO</div>
+          </ng-template>
+        </p-column>
+        <p-column field=""
+                  header="ACCIÓN"
+                  [style]="{'width':'125px'}"
+                  [sortable]="true">
+          <ng-template let-usuarios="rowData" pTemplate="body">
+            <div class="ui-helper-clearfix">
+              <button type="button"
+                      pButton
+                      (click)="selectMatricula(usuarios)"
+                      icon="pi pi-pencil"
+                      style="float:left; margin: 5px"
+                      label="Revisar">
+              </button>
+            </div>
+          </ng-template>
+        </p-column>
+      </p-dataTable>
+      <!--<p-table #dt [columns]="cols_m" [value]="data_m" [paginator]="true" [rows]="10" [responsive]="true" selectionMode="single">
+        <ng-template pTemplate="caption">
+          <div style="text-align: right">
+            <i class="fa fa-search" style="margin:4px 4px 0 0"></i>
+            <input type="text" pInputText size="50" placeholder="Global Filter" (input)="dt.filterGlobal($event.target.value, 'contains')" style="width:auto">
+          </div>
+        </ng-template>
+        <ng-template pTemplate="header" let-columns>
+          <tr>
+            <th *ngFor="let col of columns">
+              {{col.header}}
+            </th>
+          </tr>
+          <tr>
+            <th *ngFor="let col of columns" [ngSwitch]="col.field">
+              <input *ngSwitchCase="'alumnos'" pInputText type="text" (input)="dt.filter($event.target.value, col.field, col.filterMatchMode)">
+              <p-dropdown *ngSwitchCase="'carreras'" [options]="data_c" optionLabel="nombre" [style]="{'width':'100%'}" (onChange)="dt.filter($event.value, col.field, 'equals')"></p-dropdown>
+              <p-dropdown *ngSwitchCase="'ciclos'" [options]="data_cl" optionLabel="nombre" [style]="{'width':'100%'}" (onChange)="dt.filter($event.value, col.field, 'equals')"></p-dropdown>
+              <input *ngSwitchCase="'created_at'" pInputText type="text" (input)="dt.filter($event.target.value, col.field, col.filterMatchMode)">
+              <input *ngSwitchCase="'updated_at'" pInputText type="text" (input)="dt.filter($event.target.value, col.field, col.filterMatchMode)">
+              <input *ngSwitchCase="'estado'" pInputText type="text" (input)="dt.filter($event.target.value, col.field, col.filterMatchMode)">
+            </th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-rowData let-columns="columns">
+          <tr [pSelectableRow]="rowData">
+            <td *ngFor="let col of columns; index as i">
+              <span class="ui-column-title">{{col.header}}</span>
+              {{ i == 0 ? rowData[col.field].dni : '' }}
+              {{ i == 1 ? rowData[col.field].nombres : '' }}
+              {{ i == 2 ? rowData[col.field].apellidos : '' }}
+              {{ i == 3 || i == 4 ? rowData[col.field].nombre : '' }}
+              {{ i == 5 || i == 6 ? formatDateTime(rowData[col.field]) : '' }}
+              <ng-template ngIf="i == 7">
+                <div *ngIf="rowData[col.field] == 0">ANULADO</div>
+                <div *ngIf="rowData[col.field] == 1">PAGADO</div>
+                <div *ngIf="rowData[col.field] == 2">PROCESO</div>
+                <div *ngIf="rowData[col.field] == 3">OBSERVADO</div>
+                <div *ngIf="rowData[col.field] == 4">EMITIDO</div>
+              </ng-template>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>-->
+    </p-panel>
+    <p-panel *ngIf="matriculas.value.id">
+      <p-header>
+        <div class="ui-toolbar-group-left">
+          Detalle
+        </div>
+        <div class="ui-toolbar-group-right">
+          <button routerLink="inicio"
+                  type="button"
+                  pButton
+                  style="float: right;"
+                  icon="pi pi-times"
+                  class="ui-button-danger"
+                  label="Salir">
+          </button>
+          <button type="button"
+                  pButton
+                  (click)="formatMatriculas()"
+                  icon="pi pi-chevron-left"
+                  class="ui-button-success"
+                  label="Regresar">
+          </button>
+        </div>
+      </p-header>
+      <div class="row">
+        <div class="col-sm-7">
+          <p-dataView #dv [value]="data_p" [paginator]="true" [rows]="2" paginatorPosition="both" filterBy="numeroBaucher">
+            <p-header>
+              <div class="ui-helper-clearfix">
+                <div class="ui-g">
+                  <div class="ui-g-12 ui-md-3">
+                    <p-dataViewLayoutOptions></p-dataViewLayoutOptions>
+                  </div>
+                  <div class="ui-g-4 ui-md-3 filter-container">
+                    <div style="position:relative">
+                      <input type="search" pInputText placeholder="Buscar.." (keyup)="dv.filter($event.target.value)">
+                    </div>
+                  </div>
+                  <div class="ui-g-4 ui-md-3" style="text-align:right">
+                    <span style="padding: 0px;">{{ matriculas.value.tipo_pagos ? matriculas.value.coutas_pagadas + '/' + matriculas.value.tipo_pagos.partes + ' couta(s) de S/ ' +
+                      (matriculas.value.tipo_pagos ? matriculas.value.tipo_pagos.importe / matriculas.value.tipo_pagos.partes : 0) : 0 }}</span>
+                  </div>
+                  <div class="ui-g-4 ui-md-3" style="text-align:right">
+                    <span style="padding: 0px;">{{ matriculas.value ?' Total: S/ ' + matriculas.value.total : 0 }}</span>
+                  </div>
+                </div>
+              </div>
+            </p-header>
+            <ng-template let-car pTemplate="listItem">
+              <div class="ui-g" style="padding: 2em; border-bottom: 1px solid #d9d9d9">
+                <!--<div class="ui-g-12 ui-md-3" style="text-align:center">
+                  <img src="{{ car.src_img ?  url + '/storage/vauchers/' + car.src_img : 'assets/dist/img/shortcut-img.png' }}" width="40%"><br>
+                </div>-->
+                <div class="ui-g-12 ui-md-6 car-details">
+                  <div class="ui-g">
+                    <div class="ui-g-4 ui-sm-6">Importe: </div>
+                    <div class="ui-g-8 ui-sm-6"><b>{{ 'S/ ' + car.importe }}</b></div>
+
+                    <div class="ui-g-4 ui-sm-6">N° Vaucher: </div>
+                    <div class="ui-g-8 ui-sm-6"><b>{{ car.numero_vaucher ? car.numero_vaucher : 'T000-0000000000' }}</b></div>
+                  </div>
+                </div>
+                <div class="ui-g-12 ui-md-4 car-details">
+                  <div class="ui-g">
+                    <div class="ui-g-4 ui-sm-6">Reg: </div>
+                    <div class="ui-g-8 ui-sm-6"><b>{{ formatDateTime(car.created_at) }}</b></div>
+
+                    <div class="ui-g-4 ui-sm-6">Act: </div>
+                    <div class="ui-g-8 ui-sm-6"><b>{{ formatDateTime(car.updated_at) }}</b></div>
+                  </div>
+                </div>
+                <div class="ui-g-12 ui-md-2 search-icon">
+                  <button pButton type="button" icon="pi pi-search" (click)="selectPago(gallery, car)" label="Vaucher"></button>
+                  <button *ngIf="car.estado != 1" pButton type="button"  class="ui-button-success" icon="pi pi-check" (click)="onSubmit(car, 1)" label="Aprobar"></button>
+                  <button *ngIf="car.estado != 0" pButton type="button" class="ui-button-danger" icon="pi pi-times" (click)="onSubmit(car, 0)" label="Anular"></button>
+                  <button *ngIf="car.estado != 0 && car.estado != 1" pButton type="button" class="ui-button-warning" icon="pi pi-eye" (click)="observacion(car)" label="Observ."></button>
+                </div>
+              </div>
+            </ng-template>
+            <ng-template let-car pTemplate="gridItem">
+              <div style="padding:.5em;" class="ui-g-12 ui-md-4">
+                <p-panel [header]="'Vaucher ' + (car.numero_vaucher ? car.numero_vaucher : 'sin registrar')" [style]="{'text-align':'center', 'border-color' : ( car.estado == 0 ? '5px solid red' : '5px solid green')}">
+                  <img src="{{ car.src_img ?  url + '/storage/vauchers/' + car.src_img : 'assets/dist/img/shortcut-img.png' }}" width="60">
+                  <div class="car-detail">{{ 'S/ ' + car.importe }}</div>
+                  <hr class="ui-widget-content" style="border-top:0">
+                  <div class="icons">
+                    <button pButton type="button" icon="pi pi-search" (click)="selectPago(gallery, car)" label="Vaucher"></button>
+                    <button *ngIf="car.estado != 1" pButton type="button" class="ui-button-success" icon="pi pi-check" (click)="onSubmit(car, 1)" label="Aprobar"></button>
+                    <button *ngIf="car.estado != 0" pButton type="button" class="ui-button-danger" icon="pi pi-times" (click)="onSubmit(car, 0)" label="Anular"></button>
+                    <button *ngIf="car.estado != 0 && car.estado != 1" pButton type="button" class="ui-button-warning" icon="pi pi-eye" (click)="observacion(car)" label="Observ."></button>
+                  </div>
+                </p-panel>
+              </div>
+            </ng-template>
+          </p-dataView>
+        </div>
+        <div class="col-sm-5">
+          <p-panel>
+            <ngx-gallery #gallery [options]="galleryOptions" [images]="galleryImages"></ngx-gallery>
+          </p-panel>
+        </div>
+      </div>
+    </p-panel>
+  </div>
+</div>
+
+<!--Pagos-->
+<form [formGroup]="pagos" (ngSubmit)="onSubmit(pagos.value, 3)">
+  <p-dialog [(visible)]="display_p" [responsive]="true" [modal]="true">
+    <p-header>
+      Observación
+    </p-header>
+    <div class="ui-grid ui-grid-responsive ui-fluid">
+      <div class="ui-grid-row">
+        <div class="ui-grid-col-12">
+          <textarea formControlName="observacion" rows="5" cols="30" pInputTextarea></textarea>
+        </div>
+      </div>
+    </div>
+    <p-footer>
+      <div class="ui-dialog-buttonpane ui-helper-clearfix">
+        <button type="submit"
+                pButton
+                icon="pi pi-check"
+                style="float: right"
+                label="Guardar"
+                class="ui-button-success">
+        </button>
+        <button type="button"
+                pButton
+                (click)="display_p = false"
+                icon="pi pi-times"
+                label="Cancelar"
+                class="ui-button-danger">
+        </button>
+      </div>
+    </p-footer>
+  </p-dialog>
+</form>
+
+<!--Report-->
+<form [formGroup]="report" (ngSubmit)="onReport(report.value)">
+  <p-dialog [(visible)]="display_r" [responsive]="true" [modal]="true">
+    <p-header>
+      Reporte
+    </p-header>
+    <div class="ui-grid ui-grid-responsive ui-fluid" style="height: 250px;">
+      <div class="ui-grid-row">
+        <div class="ui-grid-col-4">
+          <label>Carrera <span> (*)</span></label>
+        </div>
+        <div class="ui-grid-col-8">
+          <p-dropdown [options]="data_c"
+                      optionLabel="nombre"
+                      placeholder="Seleccionar"
+                      name="carrera"
+                      formControlName="carrera">
+          </p-dropdown>
+        </div>
+      </div>
+      <div class="ui-grid-row">
+        <div class="ui-grid-col-4">
+          <label>Ciclo <span> (*)</span></label>
+        </div>
+        <div class="ui-grid-col-8">
+          <p-dropdown [options]="data_cl"
+                      optionLabel="nombre"
+                      placeholder="Seleccionar"
+                      name="ciclo"
+                      formControlName="ciclo">
+          </p-dropdown>
+        </div>
+      </div>
+      <div class="ui-grid-row">
+        <div class="ui-grid-col-4">
+          <label>Desde <span> (*)</span></label>
+        </div>
+        <div class="ui-grid-col-8">
+          <p-calendar [locale]="es"
+                      dateFormat="dd/mm/yy"
+                      [showIcon]="true"
+                      placeholder="Desde"
+                      class="toUpperCase"
+                      name="on"
+                      formControlName="on">
+          </p-calendar>
+        </div>
+      </div>
+      <div class="ui-grid-row">
+        <div class="ui-grid-col-4">
+          <label>Hasta <span> (*)</span></label>
+        </div>
+        <div class="ui-grid-col-8">
+          <p-calendar [locale]="es"
+                      dateFormat="dd/mm/yy"
+                      [showIcon]="true"
+                      placeholder="Hasta"
+                      class="toUpperCase"
+                      name="off"
+                      formControlName="off">
+
+          </p-calendar>
+        </div>
+      </div>
+    </div>
+    <p-footer>
+      <div class="ui-dialog-buttonpane ui-helper-clearfix">
+        <button type="submit"
+                pButton
+                [disabled]="!report.valid"
+                icon="pi pi-print"
+                style="float: right"
+                label="Consultar"
+                class="ui-button-success">
+        </button>
+        <button type="button"
+                pButton
+                (click)="display_r = false"
+                icon="pi pi-times"
+                label="Cancelar"
+                class="ui-button-danger">
+        </button>
+      </div>
+    </p-footer>
+  </p-dialog>
+</form>
+
+<p-dialog [style]="{'background-color': 'transparent', 'border': 'none', 'box-shadow': 'none'}"
+          [showHeader]="false" [(visible)]="display" [modal]="true" [resizable]="true"
+          [minY]="70" [maximizable]="true" [baseZIndex]="10000">
+  <p align="center" style="font-size: 200px; color: #b8c7ce;"><i class="fa fa-spinner fa-pulse"></i></p>
+</p-dialog>

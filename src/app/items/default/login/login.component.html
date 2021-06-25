@@ -1,0 +1,67 @@
+<p-growl [(value)]="msgs"></p-growl>
+<div class="login-logo" style="margin-bottom: 10px">
+  <a [routerLink]="['/']" href="#" class="text-center">
+    <img src="assets/dist/img/isfer/isfer.png" alt="Logo" width="80%">
+  </a>
+</div>
+<!-- /.login-logo -->
+<div class="card">
+  <div class="card-body login-card-body">
+    <p class="login-box-msg">Iniciar Sesión</p>
+
+    <form [formGroup]="login" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <div class="ui-inputgroup">
+          <span class="ui-inputgroup-addon"><i class="fa fa-user"></i></span>
+          <input type="email"
+                 pInputText
+                 style="width: 100%;"
+                 placeholder="Email"
+                 formControlName="email"
+                 pTooltip="Ingrese su Correo"
+                 tooltipEvent="focus"
+                 autofocus>
+        </div>
+        <small *ngIf="!login.controls['email'].valid && login.controls['email'].touched" class="form-text text-danger">Ingrese su Correo.</small>
+      </div>
+      <div class="form-group">
+        <div class="ui-inputgroup">
+          <span class="ui-inputgroup-addon"><i class="fa fa-lock"></i></span>
+          <input type="password"
+                 pInputText
+                 style="width: 100%"
+                 placeholder="Contraseña"
+                 formControlName="password"
+                 pTooltip="Ingrese su Contraseña"
+                 tooltipEvent="focus"
+                 required>
+        </div>
+        <small *ngIf="!login.controls['password'].valid && login.controls['password'].touched" class="form-text text-danger">Ingrese su Contraseña.</small>
+      </div>
+      <div class="row">
+        <div class="col-8"></div>
+        <!-- /.col -->
+        <div class="col-4">
+          <button type="submit" class="btn btn-primary btn-block btn-flat" [disabled]="!login.valid">Ingresar</button>
+        </div>
+        <!-- /.col -->
+      </div>
+    </form>
+
+    <div class="social-auth-links text-center">
+      <p>- O -</p>
+      <a [routerLink]="['/registrarme']" href="#" class="btn btn-block btn-success">
+        <i class="fa fa-user mr-2"></i>
+        Registrarme
+      </a>
+    </div>
+
+  </div>
+  <!-- /.login-card-body -->
+</div>
+
+<p-dialog [style]="{'background-color': 'transparent', 'border': 'none', 'box-shadow': 'none'}"
+          [showHeader]="false" [(visible)]="display" [modal]="true" [resizable]="true"
+          [minY]="70" [maximizable]="true" [baseZIndex]="10000">
+  <p align="center" style="font-size: 200px; color: #b8c7ce;"><i class="fa fa-spinner fa-pulse"></i></p>
+</p-dialog>

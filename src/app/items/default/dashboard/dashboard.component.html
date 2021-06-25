@@ -1,0 +1,84 @@
+<!-- Content Header (Page header) -->
+<div class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1 class="m-0 text-dark">{{title}}</h1>
+      </div><!-- /.col -->
+      <div class="col-sm-6">
+        <ol class="breadcrumb float-sm-right">
+          <li class="breadcrumb-item active">{{title}}</li>
+        </ol>
+      </div><!-- /.col -->
+    </div><!-- /.row -->
+  </div><!-- /.container-fluid -->
+</div>
+<!-- /.content-header -->
+
+<!-- Main content -->
+<section class="content">
+  <div class="container-fluid">
+    <!-- Small boxes (Stat box) -->
+    <div *ngIf="identity.perfil != 'ALUMNO(A)'" class="row">
+      <div class="col-lg-6 col-6">
+        <!-- small box -->
+        <div class="small-box bg-success">
+          <div class="inner">
+            <h3>{{ data_da.matriculas }}</h3>
+
+            <p>Matrículas Registradas</p>
+          </div>
+          <div class="icon">
+            <i class="ion ion-stats-bars"></i>
+          </div>
+          <a routerLink="/matriculas" href="#" class="small-box-footer">Más información <i class="fa fa-arrow-circle-right"></i></a>
+        </div>
+      </div>
+      <!-- ./col -->
+      <div class="col-lg-6 col-6">
+        <!-- small box -->
+        <div class="small-box bg-warning">
+          <div class="inner">
+            <h3>{{ data_da.usuarios }}</h3>
+
+            <p>Usuarios Registrados</p>
+          </div>
+          <div class="icon">
+            <i class="ion ion-person-add"></i>
+          </div>
+          <a routerLink="/usuarios" href="#" class="small-box-footer">Más información <i class="fa fa-arrow-circle-right"></i></a>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div *ngFor="let tm of data_tp" class="col-sm-6">
+        <div class="card text-center">
+          <div class="card-header">
+            {{ tm.nombre }}
+          </div>
+          <div class="card-body">
+            <h5 class="card-title">S/. {{ tm.importe }}</h5>
+            <p class="card-text">{{ tm.descripcion }}</p>
+            <a [routerLink]="['/matricula', tm.id]" href="#">
+              <button class="btn btn-outline-primary" [disabled]="validateDateTM(tm.inicio, tm.final)">Matricularme</button>
+            </a>
+          </div>
+          <div class="card-footer text-muted">
+            <span class="text-success">Inicia:</span>
+            {{ formatDate(tm.inicio) }}
+            <span class="text-danger">Vence:</span>
+            {{ formatDate(tm.final) }}
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /.row -->
+  </div><!-- /.container-fluid -->
+</section>
+<!-- /.content -->
+
+<p-dialog [style]="{'background-color': 'transparent', 'border': 'none', 'box-shadow': 'none'}"
+          [showHeader]="false" [(visible)]="display" [modal]="true" [resizable]="true"
+          [minY]="70" [maximizable]="true" [baseZIndex]="10000">
+  <p align="center" style="font-size: 200px; color: #b8c7ce;"><i class="fa fa-spinner fa-pulse"></i></p>
+</p-dialog>

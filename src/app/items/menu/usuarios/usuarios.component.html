@@ -1,0 +1,280 @@
+<!-- Content Header (Page header) -->
+<div class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1 class="m-0 text-dark">{{title}}</h1>
+      </div><!-- /.col -->
+      <div class="col-sm-6">
+        <ol class="breadcrumb float-sm-right">
+          <li class="breadcrumb-item"><a [routerLink]="['inicio']" href="#">Inicio</a></li>
+          <li class="breadcrumb-item active">{{title}}</li>
+        </ol>
+      </div><!-- /.col -->
+    </div><!-- /.row -->
+  </div><!-- /.container-fluid -->
+</div>
+<!-- /.content-header -->
+
+<div class="content">
+  <div class="container-fluid">
+    <p-panel>
+      <p-header>
+        <div class="ui-toolbar-group-left">
+          Lista de Usuarios
+        </div>
+        <div class="ui-toolbar-group-right">
+          <button routerLink="inicio"
+                  type="button"
+                  pButton
+                  icon="pi pi-times"
+                  class="ui-button-danger"
+                  label="Salir">
+          </button>
+        </div>
+      </p-header>
+      <p-toolbar>
+        <div class="ui-toolbar-group-left">
+          <i class="fa fa-search" style="margin:4px 4px 0 0"></i>
+          <input #gb type="text" pInputText placeholder="Buscar...">
+        </div>
+        <div class="ui-toolbar-group-right">
+          <button type="button"
+                  pButton
+                  (click)="loadData()"
+                  icon="pi pi-refresh"
+                  class="ui-button-success">
+          </button>
+          <button type="button"
+                  pButton
+                  (click)="add()"
+                  icon="pi pi-plus">
+          </button>
+        </div>
+      </p-toolbar>
+      <p-dataTable [value]="data_u"
+                   selectionMode="single"
+                   [globalFilter]="gb"
+                   (onRowDblclick)="edit($event.data)"
+                   [paginator]="true"
+                   [rows]="[5]"
+                   [responsive]="true"
+                   [loading]="loading_u">
+        <p-column field="dni"
+                  header="DNI"
+                  [sortable]="true">
+        </p-column>
+        <p-column field="nombres"
+                  header="NOMBRE"
+                  [sortable]="true">
+        </p-column>
+        <p-column field="apellidos"
+                  header="APELLIDOS"
+                  [sortable]="true">
+        </p-column>
+        <p-column field="email"
+                  header="USUARIO"
+                  [sortable]="true">
+        </p-column>
+        <p-column field="perfil"
+                  header="PERFIL"
+                  [sortable]="true">
+        </p-column>
+        <p-column field="created_at"
+                  header="REGISTRADO"
+                  [sortable]="true">
+          <ng-template let-col let-car="rowData" pTemplate="body">
+            <div>{{ car[col.field] ? formatDateTime(car[col.field]) : null }}</div>
+          </ng-template>
+        </p-column>
+        <p-column field="updated_at"
+                  header="ACTUALIZADO"
+                  [sortable]="true">
+          <ng-template let-col let-car="rowData" pTemplate="body">
+            <div>{{ car[col.field] ? formatDateTime(car[col.field]) : null }}</div>
+          </ng-template>
+        </p-column>
+        <p-column field="estado"
+                  header="ESTADO"
+                  [style]="{'width':'100px'}"
+                  [sortable]="true">
+        <ng-template let-col let-car="rowData" pTemplate="body">
+          <div *ngIf="car[col.field] == 1; then thenBlock else elseBlock"></div>
+          <ng-template #thenBlock>ACTIVO</ng-template>
+          <ng-template #elseBlock>BLOQUEADO</ng-template>
+        </ng-template>
+        </p-column>
+        <p-column field=""
+                  header="ACCIÓN"
+                  [style]="{'width':'125px'}"
+                  [sortable]="true">
+          <ng-template let-usuario="rowData" pTemplate="body">
+            <div class="ui-helper-clearfix">
+              <button type="button"
+                      pButton
+                      (click)="edit(usuario)"
+                      icon="pi pi-pencil"
+                      style="float:left; margin: 5px"
+                      label="Editar">
+              </button>
+            </div>
+          </ng-template>
+        </p-column>
+      </p-dataTable>
+    </p-panel>
+  </div>
+</div>
+
+<!--Growl-->
+<p-growl [(value)]="msgs"></p-growl>
+
+<!--Usuarios-->
+<form [formGroup]="usuarios">
+  <p-dialog [(visible)]="display_u" [responsive]="true" showEffect="fade" [modal]="true">
+  <p-header>
+    {{title_u}}
+  </p-header>
+  <div class="ui-grid ui-grid-responsive ui-fluid">
+    <p-accordion>
+      <p-accordionTab [selected]="true" header="Datos Principales">
+        <div class="ui-grid-row">
+          <div class="ui-grid-col-4">
+            <label>Dni <span class="red"> (*)</span></label>
+          </div>
+          <div class="ui-grid-col-8">
+            <input pInputText name="dni" formControlName="dni" maxlength="8" minlength="8">
+          </div>
+        </div>
+        <div class="ui-grid-row">
+          <div class="ui-grid-col-4">
+            <label>Nombres <span class="red"> (*)</span></label>
+          </div>
+          <div class="ui-grid-col-8">
+            <input pInputText name="nombres" formControlName="nombres" class="upperCase">
+          </div>
+        </div>
+        <div class="ui-grid-row">
+          <div class="ui-grid-col-4">
+            <label>Apellidos <span class="red"> (*)</span></label>
+          </div>
+          <div class="ui-grid-col-8">
+            <input pInputText name="apellidos" formControlName="apellidos" class="upperCase">
+          </div>
+        </div>
+        <div class="ui-grid-row">
+          <div class="ui-grid-col-4">
+            <label>Tipo Usuario <span class="red"> (*)</span></label>
+          </div>
+          <div class="ui-grid-col-8">
+            <p-dropdown [options]="data_p"
+                        placeholder="Seleccionar"
+                        [style]="{'width':'100%', 'margin-bottom':'3px'}"
+                        name="perfil"
+                        formControlName="perfil">
+            </p-dropdown>
+          </div>
+        </div>
+        <div class="ui-grid-row">
+          <div class="ui-grid-col-4">
+            <label>Email <span class="red"> (*)</span></label>
+          </div>
+          <div class="ui-grid-col-8">
+            <input pInputText name="email" formControlName="email">
+          </div>
+        </div>
+        <div class="ui-grid-row">
+          <div class="ui-grid-col-4">
+            <label>Estado</label>
+          </div>
+          <div class="ui-grid-col-8">
+            <p-checkbox binary="true"
+                        name="estado"
+                        formControlName="estado">
+            </p-checkbox>
+          </div>
+        </div>
+      </p-accordionTab>
+      <p-accordionTab header="Contraseña">
+        <div class="ui-grid-row">
+          <div class="ui-grid-col-4">
+            <label>Contraseña <span class="red"> (*)</span></label>
+          </div>
+          <div class="ui-grid-col-8">
+            <input pPassword
+                   type="password"
+                   formControlName="password"
+                   [promptLabel]="pw.promptLabelOne"
+                   [weakLabel]="pw.weakLabel"
+                   [mediumLabel]="pw.mediumLabel"
+                   [strongLabel]="pw.strongLabel"
+                   minlength="6"
+                   maxlength="20"
+                   required>
+            <small *ngIf="!usuarios.controls['email'].valid && usuarios.controls['email'].touched" class="form-text text-danger">Ingrese su Correo.</small>
+          </div>
+        </div>
+        <div class="ui-grid-row">
+          <div class="ui-grid-col-4">
+            <label>Confirmar Contr. <span class="red"> (*)</span></label>
+          </div>
+          <div class="ui-grid-col-8">
+            <input pPassword
+                   type="password"
+                   formControlName="pass"
+                   [promptLabel]="pw.promptLabelTwo"
+                   [weakLabel]="pw.weakLabel"
+                   [mediumLabel]="pw.mediumLabel"
+                   [strongLabel]="pw.strongLabel"
+                   minlength="6"
+                   maxlength="20"
+                   required>
+            <!--<small *ngIf="!pass.valid && pass.touched" class="form-text text-danger">Confirme su Contraseña, 6 dígitos como mínimo</small>-->
+          </div>
+        </div>
+      </p-accordionTab>
+    </p-accordion>
+  </div>
+  <p-footer>
+    <div class="ui-dialog-buttonpane ui-helper-clearfix">
+      <button *ngIf="!usuarios.value.id"
+              type="button"
+              pButton
+              (click)="save()"
+              icon="pi pi-check"
+              style="float: right;"
+              label="Registrar"
+              [disabled]="!usuarios.valid || !usuarios.value.password || !usuarios.value.pass"
+              class="ui-button-success">
+      </button>
+      <button *ngIf="usuarios.value.id"
+              type="button"
+              pButton
+              (click)="save()"
+              icon="pi pi-check"
+              style="float: right;"
+              label="Guardar"
+              class="ui-button-success">
+      </button>
+      <button type="reset"
+              pButton
+              icon="pi pi-spinner"
+              style="float: right;"
+              label="Limpiar">
+      </button>
+      <button type="button"
+              pButton
+              (click)="display_u = false"
+              icon="pi pi-times"
+              label="Cancelar"
+              class="ui-button-danger">
+      </button>
+    </div>
+  </p-footer>
+</p-dialog>
+</form>
+
+<p-dialog [style]="{'background-color': 'transparent', 'border': 'none', 'box-shadow': 'none'}"
+          [showHeader]="false" [(visible)]="display" [modal]="true" [resizable]="true"
+          [minY]="70" [maximizable]="true" [baseZIndex]="10000">
+  <p align="center" style="font-size: 200px; color: #b8c7ce;"><i class="fa fa-spinner fa-pulse"></i></p>
+</p-dialog>

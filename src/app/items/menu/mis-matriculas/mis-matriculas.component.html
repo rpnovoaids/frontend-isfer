@@ -1,0 +1,105 @@
+<!-- Content Header (Page header) -->
+<div class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1 class="m-0 text-dark">{{title}}</h1>
+      </div><!-- /.col -->
+      <div class="col-sm-6">
+        <ol class="breadcrumb float-sm-right">
+          <li class="breadcrumb-item"><a [routerLink]="['inicio']" href="#">Inicio</a></li>
+          <li class="breadcrumb-item active">{{title}}</li>
+        </ol>
+      </div><!-- /.col -->
+    </div><!-- /.row -->
+  </div><!-- /.container-fluid -->
+</div>
+<!-- /.content-header -->
+
+<div class="content">
+  <div class="container-fluid">
+    <p-panel>
+      <p-header>
+        <div class="ui-toolbar-group-left">Matrículas Realizadas</div>
+        <div class="ui-toolbar-group-right">
+          <button routerLink="inicio"
+                  type="button"
+                  pButton
+                  icon="pi pi-times"
+                  class="ui-button-danger"
+                  label="Cerrar">
+          </button>
+        </div>
+      </p-header>
+      <div class="card-columns">
+        <ng-template ngFor let-m="$implicit" [ngForOf]="data_m" let-i="index">
+          <div class="card">
+            <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+              <!--<ol class="carousel-indicators">
+                <ng-template ngFor let-p="$implicit" [ngForOf]="m.pagos" let-f="index">
+                  <li data-target="#carouselExampleIndicators" data-slide-to="{{ i }}" class="{{ i == 0 ? 'active' : '' }}"></li>
+                </ng-template>
+              </ol>-->
+              <div class="carousel-inner">
+                <ng-template ngFor let-p="$implicit" [ngForOf]="m.pagos" let-i="index">
+                  <div class="carousel-item {{ i == 0 ? 'active' : '' }}">
+                    <img class="d-block w-100" src="{{ p.src_img ? url + '/storage/vauchers/' + p.src_img : 'assets/dist/img/shortcut-img.png' }}" alt="First slide">
+                    <div class="carousel-caption d-none d-md-block">
+                      <p>{{ p.numero_vaucher }}</p>
+                    </div>
+                  </div>
+                </ng-template>
+              </div>
+              <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="sr-only">Previous</span>
+              </a>
+              <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="sr-only">Next</span>
+              </a>
+            </div>
+            <div class="card-body text-{{ m.estado != 0 ? (m.estado != 1 ? (m.estado != 2 ? (m.estado != 3 ? 'secundary' : 'warning') : 'info') : 'success') : 'danger' }}">
+              <h5 class="card-title">{{ m.tipo_matriculas.nombre }}</h5>
+              <p class="card-text">{{ m.carreras.nombre }}</p>
+              <p class="card-text">
+                Ciclo: {{ romanize(m.ciclos.nombre) }} - {{ m.periodos.nombre }} <br>
+                Total: S/ {{ m.total }}</p>
+              <p>Estado: <i class="fa fa-{{ m.estado != 0 ? (m.estado != 1 ? (m.estado != 2 ? (m.estado != 3 ? 'drivers-license-o' : 'warning') : 'spinner') : 'check') : 'times' }}"></i>
+                {{ m.estado != 0 ? (m.estado != 1 ? (m.estado != 2 ? (m.estado != 3 ? 'EMITIDO' : 'OBSERVADO') : 'EN PROCESO') : 'APROBADO') : 'ANULADO' }}</p>
+              <ng-template *ngIf="m.estado == 3" ngFor let-p="$implicit" [ngForOf]="m.pagos" let-f="index">
+                <!--<div class="card border-warning" style="max-width: 18rem;">
+                  <div class="card-body">
+                    <h5 class="card-title"><i class="fa fa-warning"></i> ¡Atención..!</h5>
+                    <p class="card-text text-justify">{{ p.observacion }}</p>
+                    <hr>
+                    <p class="card-text text-justify">Revise el pago para solucionar el problema.</p>
+                  </div>
+                </div>-->
+                <div class="alert alert-warning" role="alert">
+                  <h4 class="alert-heading"><i class="fa fa-warning"></i> ¡Atención..!</h4>
+                  <p class="text-justify">{{ p.observacion }}</p>
+                  <hr>
+                  <p class="text-justify">Revise el pago para solucionar el problema.</p>
+                </div>
+              </ng-template>
+              <button routerLink="/matricula/pagos/{{ m.id }}"
+                      type="button"
+                      pButton
+                      icon="pi pi-check"
+                      class="ui-button-{{ m.estado != 0 ? (m.estado != 1 ? (m.estado != 2 ? (m.estado != 3 ? 'secundary' : 'warning') : 'info') : 'success') : 'danger' }}"
+                      label="Ver Pago(s)">
+              </button>
+            </div>
+            <div class="card-footer">
+              <small class="text-muted">Última actualización el {{ formatDateTime(m.updated_at) }}</small>
+            </div>
+          </div>
+        </ng-template>
+      </div>
+    </p-panel>
+  </div>
+</div>
+
+<!--Growl-->
+<p-growl [(value)]="msgs"></p-growl>

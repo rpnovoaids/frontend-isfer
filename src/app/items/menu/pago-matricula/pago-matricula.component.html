@@ -1,0 +1,140 @@
+<!-- Content Header (Page header) -->
+<div class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1 class="m-0 text-dark">{{title}}</h1>
+      </div><!-- /.col -->
+      <div class="col-sm-6">
+        <ol class="breadcrumb float-sm-right">
+          <li class="breadcrumb-item"><a [routerLink]="['inicio']" href="#">Inicio</a></li>
+          <li class="breadcrumb-item active">{{title}}</li>
+        </ol>
+      </div><!-- /.col -->
+    </div><!-- /.row -->
+  </div><!-- /.container-fluid -->
+</div>
+<!-- /.content-header -->
+
+<div class="content">
+  <div class="container-fluid">
+    <p-panel [style]="{'margin-bottom': '10px'}">
+      <p-header>
+        <div class="ui-toolbar-group-left">Baucher(s)</div>
+        <div class="ui-toolbar-group-right">
+          <button routerLink="/mis-matriculas"
+                  type="button"
+                  pButton
+                  icon="pi pi-check"
+                  class="ui-button-success"
+                  label="Finalizar">
+          </button>
+        </div>
+      </p-header>
+      <p-dataView #dv [value]="data_p" [paginator]="true" [rows]="3" paginatorPosition="both" filterBy="numero_baucher">
+        <p-header>
+          <div class="ui-helper-clearfix">
+            <div class="ui-g">
+              <div class="ui-g-12 ui-md-3">
+                <p-dataViewLayoutOptions></p-dataViewLayoutOptions>
+              </div>
+              <div class="ui-g-4 ui-md-3 filter-container">
+                <div style="position:relative">
+                  <input type="search" pInputText placeholder="Buscar.." (keyup)="dv.filter($event.target.value)">
+                </div>
+              </div>
+              <div class="ui-g-4 ui-md-3" style="text-align:right">
+                <span style="padding: 0px;">{{ matriculas.value.tipo_pagos ? matriculas.value.coutas_pagadas + '/' + matriculas.value.tipo_pagos.partes + ' couta(s) de S/ ' +
+                  (matriculas.value.tipo_pagos ? matriculas.value.tipo_pagos.importe / matriculas.value.tipo_pagos.partes : 0) : 0 }}</span>
+              </div>
+              <div class="ui-g-4 ui-md-3" style="text-align:right">
+                <span style="padding: 0px;">{{ matriculas.value ?' Total: S/ ' + matriculas.value.total : 0 }}</span>
+              </div>
+            </div>
+          </div>
+        </p-header>
+        <ng-template let-car pTemplate="listItem">
+          <div class="ui-g" style="padding: 2em; border-bottom: 1px solid #d9d9d9">
+            <div class="ui-g-12 ui-md-3" style="text-align:center">
+              <img src="{{ car.src_img ?  url + '/storage/vauchers/' + car.src_img : 'assets/dist/img/shortcut-img.png' }}" width="40%"><br>
+            </div>
+            <div class="ui-g-12 ui-md-4 car-details">
+              <div class="ui-g">
+                <div class="ui-g-4 ui-sm-6">Importe: </div>
+                <div class="ui-g-8 ui-sm-6"><b>{{ 'S/ ' + car.importe }}</b></div>
+
+                <div class="ui-g-4 ui-sm-6">N° vaucher: </div>
+                <div class="ui-g-8 ui-sm-6"><b>{{ car.numero_vaucher ? car.numero_vaucher : 'T000-0000000000' }}</b></div>
+              </div>
+            </div>
+            <div class="ui-g-12 ui-md-4 car-details">
+              <div class="ui-g">
+                <div class="ui-g-4 ui-sm-6">Registrado: </div>
+                <div class="ui-g-8 ui-sm-6"><b>{{ formatDateTime(car.created_at) }}</b></div>
+
+                <div class="ui-g-4 ui-sm-6">Actualizado: </div>
+                <div class="ui-g-8 ui-sm-6"><b>{{ formatDateTime(car.updated_at) }}</b></div>
+              </div>
+            </div>
+            <div class="ui-g-12 ui-md-1 search-icon">
+              <button pButton type="button" icon="pi pi-search" (click)="selectPago(car)" [disabled]="car.matriculas.ciclos.etapas_id != data_e.id"></button>
+            </div>
+          </div>
+        </ng-template>
+        <ng-template let-car pTemplate="gridItem">
+          <div style="padding:.5em;" class="ui-g-12 ui-md-3">
+            <p-panel [header]="'Vaucher ' + (car.numero_vaucher ? car.numero_vaucher : 'sin registrar')" [style]="{'text-align':'center', 'border-color' : ( car.estado == 0 ? '5px solid red' : '5px solid green')}">
+              <img src="{{ car.src_img ?  url + '/storage/vauchers/' + car.src_img : 'assets/dist/img/shortcut-img.png' }}" width="60">
+              <div class="car-detail">{{ 'S/ ' + car.importe }}</div>
+              <hr class="ui-widget-content" style="border-top:0">
+              <button pButton type="button" icon="pi pi-search" (click)="selectPago(car)" [disabled]="car.matriculas.ciclos.etapas_id != data_e.id" style="margin-top:0"></button>
+            </p-panel>
+          </div>
+        </ng-template>
+      </p-dataView>
+    </p-panel>
+  </div>
+</div>
+
+<!--Growl-->
+<p-growl [(value)]="msgs"></p-growl>
+
+<form [formGroup]="pagos" (ngSubmit)="onSubmit()">
+  <p-dialog [(visible)]="display_p"
+            [maximizable]="true"
+            [responsive]="true"
+            [modal]="true"
+            (onAfterHide)="onDialogHide()">
+    <p-header>
+      {{title_p}}
+    </p-header>
+    <div class="ui-g">
+      <div class="ui-g-12" style="text-align:center">
+        <img class="img-upload" src="{{pagos.value.src_img ? url + '/storage/vauchers/' + pagos.value.src_img : 'assets/dist/img/shortcut-img.png'}}" width="200">
+        <div class="drag-drop">
+          <input type="file" (change)="onSelectFile($event)" id="photo">
+          <span class="fa-stack fa-2x">
+          <i class="fa fa-cloud fa-stack-2x bottom pulsating"></i>
+          <i class="fa fa-circle fa-stack-1x top medium"></i>
+          <i class="fa fa-arrow-circle-up fa-stack-1x top"></i>
+        </span>
+          <span class="desc">Pulse aquí para añadir archivos</span>
+        </div>
+      </div>
+      <div class="ui-g-4">
+        N° Baucher <span> (*)</span>
+      </div>
+      <div class="ui-g-8">
+        <p-inputMask formControlName="numero_vaucher"
+                     mask="T999-9999999999" slotChar=""
+                     minlength="15" maxlength="15"
+                     placeholder="T999-9999999999">
+        </p-inputMask>
+      </div>
+    </div>
+    <p-footer>
+      <button pButton class="ui-button-danger" icon="pi pi-times" type="button" (click)="onDialogHide()" label="Cancelar"></button>
+      <button pButton class="ui-button-success" icon="pi pi-check" type="submit" label="Guardar" [disabled]="!pagos.valid || !uploadedFiles"></button>
+    </p-footer>
+  </p-dialog>
+</form>
